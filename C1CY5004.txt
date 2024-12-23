@@ -1,0 +1,56 @@
+      ******************************************************************
+      *    THIS COPYBOOK CONTAINS MESSAGE LAYOUT FOR THE CSV TABLE     *
+      *    SVPATNT5                                                    *
+      ******************************************************************
+      *    MAINTENANCE:                                                *
+      *                                                                *
+      *       DATE       INITS    DPSR         DESCRIPTION             *
+      *       ----       -----    ----         -----------             *
+      *                                                                *
+      *       04/22/10   INFOSYS  P7986A       INITIAL RELEASE         *
+DBCHG2*       12/06/10   INFOSYS  P7986A       ADDITIONAL DB CHANGES   *
+      ******************************************************************
+      *01  MQ-DCLSVPATNT5.
+           05  MQ-MSG-TYPE-CODE                PIC  X(04).
+               88  88-MQ-SVPATNT5                        VALUE '5004'.
+           05  MQ-SVTRTYP5-ID                  PIC X(12).
+           05  MQ-SVTRHDR5-TRNCNTL-NO          PIC X(9).
+           05  MQ-SVTRHDR5-INTRCHG-ID          PIC X(15).
+           05  MQ-SVTRHDR5-INTCNTL-NO          PIC S9(9).
+           05  MQ-SVTRHDR5-GRPCNTL-NO          PIC S9(9).
+           05  MQ-SVBLPYT5-ID                  PIC S9(9).
+           05  MQ-SVSBSCR5-ID                  PIC S9(9).
+           05  MQ-SVPATNT5-ID                  PIC S9(9).
+           05  MQ-SVPATNT5-TRNSMSN-DT          PIC X(10).
+           05  MQ-SVPATNT5-HIERCID-NO          PIC X(12).
+           05  MQ-SVPATNT5-INDRLT-CD           PIC X(2).
+           05  MQ-SVPATNT5-DEATH-DT            PIC X(35).
+           05  MQ-SVPATNT5-UNTMSR-CD           PIC X(2).
+           05  MQ-SVPATNT5-BRTWGHT-NO          PIC X(10).
+           05  MQ-SVPATNT5-PRGNCY-IND          PIC X(1).
+           05  MQ-SVPATNT5-PATIENT-NM          PIC X(60).
+           05  MQ-SVPATNT5-PATFST-NM           PIC X(35).
+           05  MQ-SVPATNT5-PATMDL-NM           PIC X(25).
+           05  MQ-SVPATNT5-PATSFX-NM           PIC X(10).
+           05  MQ-SVPATNT5-PTADL1-TXT          PIC X(55).
+           05  MQ-SVPATNT5-PTADL2-TXT          PIC X(55).
+           05  MQ-SVPATNT5-PTNCITY-NM          PIC X(30).
+           05  MQ-SVPATNT5-PTNSTAT-CD          PIC X(2).
+           05  MQ-SVPATNT5-PTPSZP-CD           PIC X(15).
+           05  MQ-SVPATNT5-CNTRY-CD            PIC X(3).
+           05  MQ-SVPATNT5-PTNTSDV-CD          PIC X(3).
+           05  MQ-SVPATNT5-CNTCT-NM            PIC X(60).
+           05  MQ-SVPATNT5-CMNQL1-CD           PIC X(2).
+           05  MQ-SVPATNT5-CMNCT1-NO.
+               10  MQ-SVPATNT5-CMNCT1-NO-LEN   PIC S9(4).
+               10  MQ-SVPATNT5-CMNCT1-NO-TEXT  PIC X(256).
+           05  MQ-SVPATNT5-CMNQL2-CD           PIC X(2).
+           05  MQ-SVPATNT5-CMNCT2-NO.
+               10  MQ-SVPATNT5-CMNCT2-NO-LEN   PIC S9(4).
+               10  MQ-SVPATNT5-CMNCT2-NO-TEXT  PIC X(256).
+           05  MQ-SVPATNT5-PATBRTH-DT          PIC X(35).
+           05  MQ-SVPATNT5-PATGNDR-CD          PIC X(1).
+           05  MQ-SVPATNT5-PRCSCL-NO           PIC X(50).
+DBCHG2     05  MQ-SVPATNT5-PRCRFQF-CD          PIC X(3).
+DBCHG2     05  MQ-SVPATNT5-PRCSPTN-ID          PIC X(50).
+      *********************  END OF COPYBOOK  ************************

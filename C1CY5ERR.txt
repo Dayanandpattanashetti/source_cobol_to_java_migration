@@ -1,0 +1,192 @@
+      ***********************************************************************
+      *                         COPYBOOK C1CY5ERR                           *
+      ***********************************************************************
+      ***********************************************************************
+      *    MAINTENANCE:                                                     *
+      *                                                                     *
+      *        DATE         INITS  DPSR          DESCRIPTION                *
+      *        ----         ----   ----         -----------                 *
+      *        04/12/2010   INFY   P7986a       INITIAL RELEASE             *
+      ***********************************************************************
+
+      *01 LEVEL GROUP ITEM SHOULD BE DECLARED IN THE CORRESPONDING PROGRAM.
+
+      ***********************************************************************
+      *  GENERIC ERROR MESSAGES FOR DIFFERENT OPERATIONS IN THE SYSTEM      *
+      ***********************************************************************
+           05  WS-ERROR-MESSAGE              PIC X(45).
+               88  88-ERROR-RETRIEVE                     VALUE
+                      'BAD QMS AND CICS RETRIEVE                    '.
+               88  88-ERROR-RETRIEVE-CICS                VALUE
+                      'BAD CICS RETRIEVE                            '.
+               88  88-INVALID-CALL                       VALUE
+                      'UNEXPECTED CALL TO CURRENT PROGRAM           '.
+      ***********************************************************************
+      *               ERROR MESSAGES FOR OPERATIONS ON LOAD MQ              *
+      ***********************************************************************
+               88  88-ERROR-OPEN-LOAD-MQ                 VALUE
+                      'ERROR WHILE OPENING LOAD MQ                  '.
+               88  88-ERROR-GET-LOAD-MQ                  VALUE
+                      'ERROR WHILE GET FROM LOAD MQ                 '.
+               88  88-ERROR-PUT-LOAD-MQ                  VALUE
+                      'ERROR WHILE PUT INTO LOAD MQ                 '.
+               88  88-ERROR-PUT1-LOAD-MQ                 VALUE
+                      'ERROR WHILE PUT1 INTO LOAD MQ                '.
+               88  88-ERROR-CLOSE-LOAD-MQ                VALUE
+                      'ERROR WHILE CLOSING LOAD MQ                  '.
+      ***********************************************************************
+      *           ERROR MESSAGES FOR OPERATIONS ON LOAD ERROR MQ            *
+      ***********************************************************************
+               88  88-ERROR-OPEN-LOADERR-MQ              VALUE
+                      'ERROR WHILE OPENING LOAD ERROR MQ            '.
+               88  88-ERROR-GET-LOADERR-MQ               VALUE
+                      'ERROR WHILE GET FROM LOAD ERROR MQ           '.
+               88  88-ERROR-PUT-LOADERR-MQ               VALUE
+                      'ERROR WHILE PUT INTO LOAD ERROR MQ           '.
+               88  88-ERROR-PUT1-LOADERR-MQ              VALUE
+                      'ERROR WHILE PUT1 INTO LOAD ERROR MQ          '.
+               88  88-ERROR-CLOSE-LOADERR-MQ             VALUE
+                      'ERROR WHILE CLOSING LOAD ERROR MQ            '.
+      ***********************************************************************
+      *             ERROR MESSAGES FOR OPERATIONS ON AUDIT MQ               *
+      ***********************************************************************
+               88  88-ERROR-OPEN-AUDIT-MQ                VALUE
+                      'ERROR WHILE OPENING AUDIT MQ                 '.
+               88  88-ERROR-GET-AUDIT-MQ                 VALUE
+                      'ERROR WHILE GET FROM AUDIT MQ                '.
+               88  88-ERROR-PUT-AUDIT-MQ                 VALUE
+                      'ERROR WHILE PUT INTO AUDIT MQ                '.
+               88  88-ERROR-PUT1-AUDIT-MQ                VALUE
+                      'ERROR WHILE PUT1 INTO AUDIT MQ               '.
+               88  88-ERROR-CLOSE-AUDIT-MQ               VALUE
+                      'ERROR WHILE CLOSING AUDIT MQ                 '.
+      ***********************************************************************
+      *          ERROR MESSAGES FOR OPERATIONS ON AUDIT FAIL MQ             *
+      ***********************************************************************
+               88  88-ERROR-OPEN-AUDFAIL-MQ              VALUE
+                      'ERROR WHILE OPENING AUDIT FAIL MQ            '.
+               88  88-ERROR-GET-AUDFAIL-MQ               VALUE
+                      'ERROR WHILE GET FROM AUDIT FAIL MQ           '.
+               88  88-ERROR-PUT-AUDFAIL-MQ               VALUE
+                      'ERROR WHILE PUT INTO AUDIT FAIL MQ           '.
+               88  88-ERROR-PUT1-AUDFAIL-MQ              VALUE
+                      'ERROR WHILE PUT1 INTO AUDIT FAIL MQ          '.
+               88  88-ERROR-CLOSE-AUDFAIL-MQ             VALUE
+                      'ERROR WHILE CLOSING AUDIT FAIL MQ            '.
+      ***********************************************************************
+      *             ERROR MESSAGES FOR OPERATIONS ON MCI LOAD MQ            *
+      ***********************************************************************
+               88  88-ERROR-OPEN-MCILD-MQ                VALUE
+                      'ERROR WHILE OPENING MCI LOAD MQ              '.
+               88  88-ERROR-GET-MCILD-MQ                 VALUE
+                      'ERROR WHILE GET FROM MCI LOAD MQ             '.
+               88  88-ERROR-PUT-MCILD-MQ                 VALUE
+                      'ERROR WHILE PUT INTO MCI LOAD MQ             '.
+               88  88-ERROR-PUT1-MCILD-MQ                VALUE
+                      'ERROR WHILE PUT1 INTO MCI LOAD MQ            '.
+               88  88-ERROR-CLOSE-MCILD-MQ               VALUE
+                      'ERROR WHILE CLOSING MCI LOAD MQ              '.
+      ***********************************************************************
+      *           ERROR MESSAGES FOR OPERATIONS ON MCI ERROR MQ             *
+      ***********************************************************************
+               88  88-ERROR-OPEN-MCIERR-MQ               VALUE
+                      'ERROR WHILE OPENING MCI ERROR MQ             '.
+               88  88-ERROR-GET-MCIERR-MQ                VALUE
+                      'ERROR WHILE GET FROM MCI ERROR MQ            '.
+               88  88-ERROR-PUT-MCIERR-MQ                VALUE
+                      'ERROR WHILE PUT INTO MCI ERROR MQ            '.
+               88  88-ERROR-PUT1-MCIERR-MQ               VALUE
+                      'ERROR WHILE PUT1 INTO MCI ERROR MQ           '.
+               88  88-ERROR-CLOSE-MCIERR-MQ              VALUE
+                      'ERROR WHILE CLOSING MCI ERROR MQ             '.
+      ***********************************************************************
+      *        ERROR MESSAGES FOR OPERATIONS ON ACKNOWLEGEMENT MQ           *
+      ***********************************************************************
+               88  88-ERROR-OPEN-ACKNOW-MQ               VALUE
+                      'ERROR WHILE OPENING ACKNOWLEDGEMENT MQ       '.
+               88  88-ERROR-GET-ACKNOW-MQ                VALUE
+                      'ERROR WHILE GET FROM ACKNOWLEDGEMENT MQ      '.
+               88  88-ERROR-PUT-ACKNOW-MQ                VALUE
+                      'ERROR WHILE PUT INTO ACKNOWLEDGEMENT MQ      '.
+               88  88-ERROR-PUT1-ACKNOW-MQ               VALUE
+                      'ERROR WHILE PUT1 INTO ACKNOWLEDGEMENT MQ     '.
+               88  88-ERROR-CLOSE-ACKNOW-MQ              VALUE
+                      'ERROR WHILE CLOSING ACKNOWLEDGEMENT MQ       '.
+      ***********************************************************************
+      *                  ERROR MESSAGES FOR DB2 OPERATIONS                  *
+      ***********************************************************************
+               88  88-ERROR-DECLARE-CURSOR               VALUE
+                      ' ERROR WHILE DECLARING CURSOR                '.
+               88  88-ERROR-OPEN-CURSOR                  VALUE
+                      ' ERROR WHILE OPENING CURSOR                  '.
+               88  88-ERROR-FETCH-CURSOR                 VALUE
+                      ' ERROR WHILE FETCHING CURSOR                 '.
+               88  88-ERROR-CLOSE-CURSOR                 VALUE
+                      ' ERROR WHILE CLOSING CURSOR                  '.
+               88  88-ERROR-INSERT                       VALUE
+                      ' ERROR WHILE INSERTING ROW IN DB2            '.
+               88  88-ERROR-UPDATE                       VALUE
+                      ' ERROR WHILE UPDATING ROW IN DB2             '.
+               88  88-ERROR-COUNT                        VALUE
+                      ' ERROR WHILE COUNTING ROWS IN DB2            '.
+               88  88-ERROR-SELECT                       VALUE
+                      ' ERROR WHILE SELECTING ROW(S) IN DB2         '.
+               88  88-ERROR-DELETE                       VALUE
+                      ' ERROR WHILE DELETING ROWS FROM DB2          '.
+      ***********************************************************************
+      *             ERROR MESSAGES FOR ONLINE LOAD PROCESS                  *
+      ***********************************************************************
+               88  88-ERROR-INSERT-DUPLICATE             VALUE
+                      'DUPL MSG ERR.MSG-PUT IN LOAD-ERR Q SUCCESS   '.
+               88  88-ERROR-INVALID-REQUEST              VALUE
+                      'INVALID REQ ERR.MSG-PUT IN LOAD-ERR Q SUCCESS'.
+               88  88-ERROR-DATA-INVALID                 VALUE
+                      'NON-NUMERIC DATA.MSG-PUT IN LOAD-ERR Q SUCCES'.
+               88  88-ERROR-PUT-AND-DUPLICATE            VALUE
+                      'DUPL MSG ERR & MSG-PUT IN LOAD-ERR Q ERROR   '.
+               88  88-ERROR-PUT-AND-INVALID-REQ          VALUE
+                      'INVALID REQ ERR & MSG-PUT IN LOAD-ERR Q ERROR'.
+               88  88-ERROR-PUT-AND-INVALID-DATA         VALUE
+                      'NONNUMERIC DATA & MSG-PUT IN LOAD-ERR Q ERROR'.
+      ***********************************************************************
+      *                ERROR MESSAGE FOR UNKNOWN ERRORS                     *
+      ***********************************************************************
+               88  88-ERROR-UNKNOWN                      VALUE
+                      'UNKNOWN ERROR ENCOUNTERED                    '.
+      ***********************************************************************
+      *              REQUEST CAUSING THE ERROR IN THE SYSTEM                *
+      ***********************************************************************
+           05  WS-ERROR-REQUEST              PIC X(06).
+               88  88-ERROR-QMS-REQUEST                  VALUE
+                                                           'QMS***'.
+               88  88-ERROR-MQOPEN-REQUEST               VALUE
+                                                           'MQOPEN'.
+               88  88-ERROR-MQGET-REQUEST                VALUE
+                                                           'MQGET '.
+               88  88-ERROR-MQPUT-REQUEST                VALUE
+                                                           'MQPUT '.
+               88  88-ERROR-MQCLOSE-REQUEST              VALUE
+                                                           'MQCLOS'.
+
+      ***********************************************************************
+      *      MQ MESSAGES HEADERS FOR DIFFERENT ERRORS IN THE SYSTEM         *
+      ***********************************************************************
+           05  WS-ERROR-MQHEADER             PIC X(16).
+               88  88-ERROR-MSGDEST-DUP                  VALUE
+                      'CSVDBLDDUPLICATE'.
+               88  88-ERROR-MSGDEST-ASRA                 VALUE
+                      'CSVDBLDASRA     '.
+               88  88-ERROR-MSGDEST-INVALID              VALUE
+                      'CSVDBLDINVALIDMQ'.
+               88  88-ERROR-MSGDEST-AUDIT                VALUE
+                      'CSVDBADAUDITFAIL'.
+               88  88-ERROR-MSGDEST-LMCICSV              VALUE
+                      'MCIDBLDERRFRMCSV'.
+               88  88-ERROR-MSGDEST-LDMCI                VALUE
+                      'MCIDBLDERRFRMMCI'.
+               88  88-ERROR-MSGDEST-UCKMCI               VALUE
+                      'UCKALREADYINMCI '.
+      ***********************************************************************
+      *                      END OF COPYBOOK C1CY5ERR                       *
+      ***********************************************************************
+

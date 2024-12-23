@@ -1,0 +1,35 @@
+000010****************************************************************
+000020*    SQL COMMUNICATION AREA     : SQLCA                        *
+000050*                                                              *
+000060*    CONTAINS SQL ERROR HANDLING INFORMATION                   *
+000070*                                                              *
+000070*  SQLCODE CONTAINS THE SQL RETURN CODE, WHICH INDICATES THE   *
+000070*  SUCCESS OR FAILURE OF THE LAST SQL STATEMENT EXECUTED. CODE *
+000070*  A COBOL IF STATEMENT IMMEDIATELY AFTER EVERY SQL STATEMENT  *
+000070*  TO CHECK THE VALUE OF THE SQLCODE.                          *
+000070*                                                              *
+000200****************************************************************
+       01 SQLCA.
+002640     05  SQLCAID                PIC X(8).                                1
+002640     05  SQLCABC                PIC S9(9) COMPUTATIONAL.                 1
+002640     05  SQLCODE                PIC S9(9) COMPUTATIONAL.                 1
+002640     05  SQLERRM.                                                        1
+002640         49 SQLERRML            PIC S9(4) COMPUTATIONAL.                 1
+002640         49 SQLERRML            PIC X(70).                               1
+002640     05  SQLERRP                PIC X(8).                                1
+002640     05  SQLERRD                OCCURS 6 TIMES                           1
+002640                                PIC S9(9) COMPUTATIONAL.                 1
+002640     05  SQLWARN.                                                        1
+002640         10  SQLWARN0           PIC X(1).                                1
+002640         10  SQLWARN1           PIC X(1).                                1
+002640         10  SQLWARN2           PIC X(1).                                1
+002640         10  SQLWARN3           PIC X(1).                                1
+002640         10  SQLWARN4           PIC X(1).                                1
+002640         10  SQLWARN5           PIC X(1).                                1
+002640         10  SQLWARN6           PIC X(1).                                1
+002640         10  SQLWARN7           PIC X(1).                                1
+002640     05  SQLEXT.                                                         1
+002640         10  SQLWARN8           PIC X(1).                                1
+002640         10  SQLWARN9           PIC X(1).                                1
+002640         10  SQLWARNA           PIC X(1).                                1
+002640         10  SQLSTATE           PIC X(5).                                1

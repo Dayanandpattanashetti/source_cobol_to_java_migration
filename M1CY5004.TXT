@@ -1,0 +1,813 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    M1CY5004.
+       AUTHOR.        INFOSYS.
+       DATE-WRITTEN.  04/30/10.
+       DATE-COMPILED.
+      ******************************************************************
+      * THIS MODULE IS A COMMON DATABASE ACCESS MODULE WHICH IS CALLED *
+      * BY BOTH LOAD AND AUDIT MODULES FOR ANY DATABASE RELATED        *
+      * OPERATIONS. IT POPULATES THE DCLGEN WITH MQ-VARIABLES AND THEN *
+      * CHECKS THE OPERATION TYPE TO PERFORM THE CORRESPONDING SQL     *
+      * OPERATION.                                                     *
+      * CALLING MODULE: M1CY5LD2 MODULE AND M1CYADP2 MODULE            *
+      *                                                                *
+      * COPYBOOK USED: C1CY5MSG COMMON VARIABLES OF MAX MESSAGE LEN    *
+      *                C1CY5004 MQ FORMAT DETAILS FOR MSG TYPE 07.     *
+      *                C1CY5DB2 COMMON VARIABLES USED ACROSS MODULES   *
+      *                C1CY5ERR ERROR MESSAGES THAT WILL POPULATE FOR  *
+      *                         ALERTS TO PRODUCTION SUPPORT.          *
+      *                                                                *
+      * DCLGEN USED  : SVPATNT5 DCLGEN FOR TABLE SV_PATIENT            *
+      ******************************************************************
+      ******************************************************************
+      *    MAINTENANCE:                                                *
+      *                                                                *
+      *        DATE         INITS  DPSR          DESCRIPTION           *
+      *        ----------   -----  ----          -----------           *
+      *        04/30/2010   INFY   P7986A        INITIAL RELEASE       *
+DEFFIX*        10/30/2010   INFY DEF0200475353   THE FIELD             *
+DEFFIX*                                          SVPATNT_CMNQL2_CD WAS *
+DEFFIX*                                          NOT BEING MOVED TO AND*
+DEFFIX*                                          FROM COPYBOOK VARIABLE*
+DEFFIX*                                          PROPERLY              *
+DBCHG2*        12/06/10     INFY   P798A         ADDITION OF NEW       *
+DBCHG2*                                          COLUMNS               *
+      ******************************************************************
+       ENVIRONMENT DIVISION.
+      ******************************************************************
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-3090.
+       OBJECT-COMPUTER. IBM-3090.
+      ******************************************************************
+       DATA DIVISION.
+      ******************************************************************
+
+      ******************************************************************
+      * WORKING STORAGE STARTS HERE.                                   *
+      ******************************************************************
+
+      ******************************************************************
+       WORKING-STORAGE SECTION.
+      ******************************************************************
+
+      ******************************************************************
+      * THE GROUP CONTAINS DETAILS OF PRESENT PROGRAM                  *
+      ******************************************************************
+
+       01  WS-MAIN-STORAGE-DATA.
+           05  WS-CONSTANTS.
+               10  WS-PRESENT-PROGRAM       PIC X(08) VALUE 'M1CY5004'.
+           05  WS-NO-OF-RECORDS             PIC S9(09) COMP.
+           05  WS-ERROR-TABLE-INFO.
+               10  FILLER                   PIC X(21) VALUE
+                                            'CLAIM-ABOVE MSG TYPE:'.
+               10  WS-MESSAGE-TYPE          PIC X(04) VALUE SPACES.
+               10  FILLER                   PIC X(01) VALUE '-'.
+               10  WS-TABLE-NAME            PIC X(08) VALUE 'SVPATNT5'.
+      *    05  WS-TMP-NUM9-CHK               PIC X(09)   VALUE SPACES.
+      *    05  WS-TMP-NUM4-CHK               PIC X(04)   VALUE SPACES.
+           05  WS-ASRA-FLAG                  PIC X(01)   VALUE 'V'.
+               88 88-ALL-FLDS-VALID                      VALUE 'V'.
+               88 88-INVALID-FLD                         VALUE 'I'.
+           05  WS-INVLD-FLD-MOVD-FLAG        PIC X(01)   VALUE SPACES.
+               88 88-FIRST-INVLD-FLD-MOVED               VALUE 'Y'.
+
+           05  WS-QUERY-EXECUTED             PIC X(01)   VALUE 'Y'.
+               88 88-QUERY-NOT-RUN                       VALUE 'N'.
+               88 88-QUERY-RUN                           VALUE 'Y'.
+
+       01  WS-SQL-TEXT-LENGTH                PIC S9(8)         COMP
+                                                         VALUE +072.
+
+       01  WS-SQL-ERROR-MSG.
+           05 WS-SQL-MSG-LENGTH              PIC S9(4)         COMP
+                                                         VALUE +936.
+           05 WS-SQL-ERROR-MSG-TEXT
+                                             PIC X(72)
+                                             OCCURS 13 TIMES.
+      ******************************************************************
+      *  INCLUDE RECORD FOR SQL CODE ETC.                              *
+      ******************************************************************
+
+           EXEC SQL
+               INCLUDE SQLCA
+           END-EXEC.
+
+      ******************************************************************
+      *    DCLGEN FOR SVPATNT TABLE                                    *
+      ******************************************************************
+
+           EXEC SQL
+               INCLUDE SVPATNT5
+           END-EXEC.
+
+      ******************************************************************
+      * THE COPY BOOK CONTAINS ERROR MESSAGES FOR MAILS AND BEEPER     *
+      ******************************************************************
+
+       01  WS-ERROR-MESSAGES.
+           COPY C1CY5ERR.
+
+      ******************************************************************
+      * THE COPYBOOK CONTAINS MQ DATA WHICH IS CONTAINS TABLE RELATED  *
+      * DATA. THIS MQ LAYOUT IS FOR TABLE SVPATNT                      *
+      ******************************************************************
+
+       01  WS-CLAIM-RECORD.
+           COPY C1CY5004.
+
+      ******************************************************************
+      * WORKING STORAGE ENDS HERE.                                     *
+      ******************************************************************
+
+      ******************************************************************
+       LINKAGE SECTION.
+      ******************************************************************
+
+      ******************************************************************
+      * THE COPYBOOK C1CYLFUL CONTAINS COMMON VARIABLES OF MAXIMUM     *
+      * MESSAGE LENGTH.                                                *
+      ******************************************************************
+
+       01  SV-CLAIM-RECORD.
+           COPY C1CY5MSG                    REPLACING ==:XX:==
+                                            BY        ==LS==.
+
+      ******************************************************************
+      *    THE COPYBOOK CONTAINS VARIABLES USED ACROSS MODULES         *
+      ******************************************************************
+
+       01  LCP-COMMON-PARAMETER.
+           COPY C1CY5DB2.
+
+      ******************************************************************
+       PROCEDURE DIVISION USING SV-CLAIM-RECORD
+                                LCP-COMMON-PARAMETER.
+      ******************************************************************
+
+       P0000-MAIN.
+
+
+           PERFORM P1000-INITIALIZATION.
+
+           IF 88-LCP-CC-GOOD
+               PERFORM P2000-PROCESS-MESSAGES
+           END-IF.
+
+
+           GOBACK.
+
+       P0000-MAIN-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS COUNTER CHECKS WHETHER INFOMATION REQUESTED IS FOR THE    *
+      * CORRECT TABLE.                                                 *
+      ******************************************************************
+
+       P1000-INITIALIZATION.
+
+           MOVE SV-CLAIM-RECORD             TO WS-CLAIM-RECORD.
+
+           COMPUTE LCP-NO-OF-RECORDS = LCP-NO-OF-RECORDS + LENGTH OF
+                                               WS-CLAIM-RECORD.
+
+           IF 88-MQ-SVPATNT5
+               SET 88-LCP-CC-GOOD           TO TRUE
+           ELSE
+               SET 88-LCP-CC-BAD            TO TRUE
+           END-IF.
+
+           SET 88-QUERY-RUN                 TO TRUE.
+
+       P1000-INITIALIZATION-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS WILL CHECK THE OPERATION TYPE REQUESTED, ACCORDINGLY IT   *
+      * MOVES THE MQ VARIABLES TO DCLGEN AND PERFORMS THE CORRESPONDING*
+      * SQL OPERATION. IN CASE OF INVAID SQL REQUEST SETS 88-LCP-CC-IN *
+      * VALID-REQUEST TO TRUE. NOTE THAT 88-LCP-CC-GOOD IS ALWAYS TRUE *
+      * TRUE WHEN THIS PARAGRAPH IS PERFORMED.                         *
+      ******************************************************************
+
+       P2000-PROCESS-MESSAGES.
+
+           EVALUATE TRUE
+               WHEN 88-LCP-INSERT-REQUEST
+                   PERFORM P2100-MOVE-DCLGEN-ALL
+                   IF  88-ALL-FLDS-VALID
+                       PERFORM P2200-INSERT-RECORD
+                   END-IF
+               WHEN 88-LCP-DELETE-REQUEST
+                   PERFORM P2300-MOVE-DCLGEN-PARTKEY
+                                            THRU
+                           P2300-MOVE-DCLGEN-PARTKEY-EXIT
+                   PERFORM P2750-DELETE-ALL THRU
+                           P2750-DELETE-ALL-EXIT
+               WHEN 88-LCP-COUNT-REQUEST
+                   PERFORM P2300-MOVE-DCLGEN-PARTKEY
+                   PERFORM P2400-COUNT-RECORD
+               WHEN 88-LCP-SELECT-ONE-REQUEST
+                   PERFORM P2300-MOVE-DCLGEN-PARTKEY
+                   PERFORM P2600-SELECT-RECORD
+               WHEN OTHER
+                   SET 88-LCP-CC-INVALID-REQUEST
+                                            TO TRUE
+           END-EVALUATE.
+
+           IF 88-QUERY-RUN
+              IF  88-LCP-SQL-0-SUCCESSFUL
+                  CONTINUE
+              ELSE
+                   PERFORM P3000-REFORMAT-SQLCA THRU
+                           P3000-REFORMAT-SQLCA-EXIT
+                   MOVE WS-SQL-ERROR-MSG         TO LCP-SQL-ERROR-MSG
+              END-IF
+           END-IF.
+
+       P2000-PROCESS-MESSAGES-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS WILL BE PERFORMED FOR INSERT REQUESTS. VARIABLES FROM THE *
+      * MQ FORMAT COPYBOOK WILL BE MOVED THE CORRECT DCLGEN VARIABLES. *
+      ******************************************************************
+
+       P2100-MOVE-DCLGEN-ALL.
+
+           SET 88-ALL-FLDS-VALID                 TO TRUE
+           MOVE SPACES                           TO
+                                              WS-INVLD-FLD-MOVD-FLAG
+
+           PERFORM P2150-CHCK-INVLD-FLDS    THRU
+                                         P2150-CHCK-INVLD-FLDS-EXIT
+           IF  88-ALL-FLDS-VALID
+           MOVE MQ-SVTRTYP5-ID               TO SVTRTYP-ID
+           MOVE MQ-SVTRHDR5-TRNCNTL-NO       TO SVTRHDR-TRNCNTL-NO
+           MOVE MQ-SVTRHDR5-INTRCHG-ID       TO SVTRHDR-INTRCHG-ID
+           MOVE MQ-SVTRHDR5-INTCNTL-NO       TO SVTRHDR-INTCNTL-NO
+           MOVE MQ-SVTRHDR5-GRPCNTL-NO       TO SVTRHDR-GRPCNTL-NO
+           MOVE MQ-SVBLPYT5-ID               TO SVBLPYT-ID
+           MOVE MQ-SVSBSCR5-ID               TO SVSBSCR-ID
+           MOVE MQ-SVPATNT5-ID               TO SVPATNT-ID
+           MOVE MQ-SVPATNT5-TRNSMSN-DT       TO SVPATNT-TRNSMSN-DT
+           MOVE MQ-SVPATNT5-HIERCID-NO       TO SVPATNT-HIERCID-NO
+           MOVE MQ-SVPATNT5-INDRLT-CD        TO SVPATNT-INDRLT-CD
+           MOVE MQ-SVPATNT5-DEATH-DT      TO SVPATNT-DEATH-DT
+           MOVE MQ-SVPATNT5-UNTMSR-CD     TO SVPATNT-UNTMSR-CD
+           MOVE MQ-SVPATNT5-BRTWGHT-NO    TO SVPATNT-BRTWGHT-NO
+           MOVE MQ-SVPATNT5-PRGNCY-IND    TO SVPATNT-PRGNCY-IND
+           MOVE MQ-SVPATNT5-PATIENT-NM    TO SVPATNT-PATIENT-NM
+           MOVE MQ-SVPATNT5-PATFST-NM     TO SVPATNT-PATFST-NM
+           MOVE MQ-SVPATNT5-PATMDL-NM     TO SVPATNT-PATMDL-NM
+           MOVE MQ-SVPATNT5-PATSFX-NM     TO SVPATNT-PATSFX-NM
+           MOVE MQ-SVPATNT5-PTADL1-TXT    TO SVPATNT-PTADL1-TXT
+           MOVE MQ-SVPATNT5-PTADL2-TXT    TO SVPATNT-PTADL2-TXT
+           MOVE MQ-SVPATNT5-PTNCITY-NM    TO SVPATNT-PTNCITY-NM
+           MOVE MQ-SVPATNT5-PTNSTAT-CD    TO SVPATNT-PTNSTAT-CD
+           MOVE MQ-SVPATNT5-PTPSZP-CD     TO SVPATNT-PTPSZP-CD
+           MOVE MQ-SVPATNT5-CNTRY-CD      TO SVPATNT-CNTRY-CD
+           MOVE MQ-SVPATNT5-PTNTSDV-CD    TO SVPATNT-PTNTSDV-CD
+           MOVE MQ-SVPATNT5-CNTCT-NM      TO SVPATNT-CNTCT-NM
+           MOVE MQ-SVPATNT5-CMNQL1-CD        TO SVPATNT-CMNQL1-CD
+           MOVE MQ-SVPATNT5-CMNCT1-NO-LEN    TO SVPATNT-CMNCT1-NO-LEN
+           MOVE MQ-SVPATNT5-CMNCT1-NO-TEXT  TO SVPATNT-CMNCT1-NO-TEXT
+DEFFIX     MOVE MQ-SVPATNT5-CMNQL2-CD        TO SVPATNT-CMNQL2-CD
+           MOVE MQ-SVPATNT5-CMNCT2-NO-LEN    TO SVPATNT-CMNCT2-NO-LEN
+           MOVE MQ-SVPATNT5-CMNCT2-NO-TEXT  TO SVPATNT-CMNCT2-NO-TEXT
+           MOVE MQ-SVPATNT5-PATBRTH-DT       TO SVPATNT-PATBRTH-DT
+           MOVE MQ-SVPATNT5-PATGNDR-CD       TO SVPATNT-PATGNDR-CD
+           MOVE MQ-SVPATNT5-PRCSCL-NO        TO SVPATNT-PRCSCL-NO
+DBCHG2     MOVE MQ-SVPATNT5-PRCRFQF-CD       TO SVPATNT-PRCRFQF-CD
+DBCHG2     MOVE MQ-SVPATNT5-PRCSPTN-ID       TO SVPATNT-PRCSPTN-ID
+           ELSE
+               PERFORM P2175-POPULATE-ERROR THRU
+                                            P2175-POPULATE-ERROR-EXIT
+           END-IF.
+
+       P2100-MOVE-DCLGEN-ALL-EXIT.
+           EXIT.
+
+      ******************************************************************
+      *      THIS PARAGRAPH WILL CHECK IF THE PASSED DATA HAS ANY      *
+      *               ALPHANUMERIC DATA IN A NUMERIC FIELD             *
+      ******************************************************************
+
+       P2150-CHCK-INVLD-FLDS.
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVTRHDR5-INTCNTL-NO        TO WS-TMP-NUM9-CHK
+               IF  MQ-SVTRHDR5-INTCNTL-NO IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 041                      TO LCP-FIELD-OFFSET
+                   MOVE 009                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVTRHDR5-GRPCNTL-NO        TO WS-TMP-NUM9-CHK
+               IF  MQ-SVTRHDR5-GRPCNTL-NO IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 050                      TO LCP-FIELD-OFFSET
+                   MOVE 009                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVBLPYT5-ID                TO WS-TMP-NUM9-CHK
+               IF  MQ-SVBLPYT5-ID IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 059                      TO LCP-FIELD-OFFSET
+                   MOVE 009                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVSBSCR5-ID                TO WS-TMP-NUM9-CHK
+               IF  MQ-SVSBSCR5-ID IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 068                      TO LCP-FIELD-OFFSET
+                   MOVE 009                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVPATNT5-ID                TO WS-TMP-NUM9-CHK
+               IF  MQ-SVPATNT5-ID IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 077                      TO LCP-FIELD-OFFSET
+                   MOVE 009                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVPATNT5-CMNCT1-NO-LEN     TO WS-TMP-NUM4-CHK
+               IF  MQ-SVPATNT5-CMNCT1-NO-LEN IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 513                      TO LCP-FIELD-OFFSET
+                   MOVE 004                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF
+
+           IF  88-FIRST-INVLD-FLD-MOVED
+               NEXT SENTENCE
+           ELSE
+      *        MOVE MQ-SVPATNT5-CMNCT2-NO-LEN     TO WS-TMP-NUM4-CHK
+               IF  MQ-SVPATNT5-CMNCT2-NO-LEN IS NUMERIC
+                   CONTINUE
+               ELSE
+                   SET 88-INVALID-FLD            TO TRUE
+                   SET 88-FIRST-INVLD-FLD-MOVED
+                                                 TO TRUE
+                   MOVE 775                      TO LCP-FIELD-OFFSET
+                   MOVE 004                      TO LCP-FIELD-LENGTH
+               END-IF
+           END-IF.
+
+       P2150-CHCK-INVLD-FLDS-EXIT.
+           EXIT.
+      ******************************************************************
+      * THIS WILL POPULATE THE ERROR DETAILS FOR ALPHANUMERIC DATA     *
+      * IN A NUMERIC FIELD.                                            *
+      ******************************************************************
+
+       P2175-POPULATE-ERROR.
+
+           SET 88-LCP-CC-INVALID-DATA            TO TRUE
+      * THE FLAG IS BEING SET TO PREVENT THE CALL TO DSNTIAR           *
+           SET 88-QUERY-NOT-RUN                  TO TRUE.
+           MOVE MQ-MSG-TYPE-CODE                 TO WS-MESSAGE-TYPE
+           MOVE WS-ERROR-TABLE-INFO              TO LCP-ERROR-INFO
+           MOVE WS-PRESENT-PROGRAM               TO LCP-ERROR-MODULE
+           MOVE LCP-PROCESS-REQUEST              TO LCP-ERROR-REQUEST.
+
+       P2175-POPULATE-ERROR-EXIT.
+           EXIT.
+      ******************************************************************
+      * THIS WILL BE PERFORMED FOR INSERT REQUESTS.                    *
+      ******************************************************************
+
+       P2200-INSERT-RECORD.
+
+           EXEC SQL
+               INSERT
+               INTO
+                   SVPATNT5 (
+                       SVTRTYP_ID,
+                       SVTRHDR_TRNCNTL_NO,
+                       SVTRHDR_INTRCHG_ID,
+                       SVTRHDR_INTCNTL_NO,
+                       SVTRHDR_GRPCNTL_NO,
+                       SVBLPYT_ID,
+                       SVSBSCR_ID,
+                       SVPATNT_ID,
+                       SVPATNT_TRNSMSN_DT,
+                       SVPATNT_HIERCID_NO,
+                       SVPATNT_INDRLT_CD,
+                       SVPATNT_DEATH_DT,
+                       SVPATNT_UNTMSR_CD,
+                       SVPATNT_BRTWGHT_NO,
+                       SVPATNT_PRGNCY_IND,
+                       SVPATNT_PATIENT_NM,
+                       SVPATNT_PATFST_NM,
+                       SVPATNT_PATMDL_NM,
+                       SVPATNT_PATSFX_NM,
+                       SVPATNT_PTADL1_TXT,
+                       SVPATNT_PTADL2_TXT,
+                       SVPATNT_PTNCITY_NM,
+                       SVPATNT_PTNSTAT_CD,
+                       SVPATNT_PTPSZP_CD,
+                       SVPATNT_CNTRY_CD,
+                       SVPATNT_PTNTSDV_CD,
+                       SVPATNT_CNTCT_NM,
+                       SVPATNT_CMNQL1_CD,
+                       SVPATNT_CMNCT1_NO,
+                       SVPATNT_CMNQL2_CD,
+                       SVPATNT_CMNCT2_NO,
+                       SVPATNT_PATBRTH_DT,
+                       SVPATNT_PATGNDR_CD,
+                       SVPATNT_PRCSCL_NO,
+DBCHG2                 SVPATNT_PRCRFQF_CD,
+DBCHG2                 SVPATNT_PRCSPTN_ID
+                           )
+               VALUES      (
+                       :SVTRTYP-ID,
+                       :SVTRHDR-TRNCNTL-NO,
+                       :SVTRHDR-INTRCHG-ID,
+                       :SVTRHDR-INTCNTL-NO,
+                       :SVTRHDR-GRPCNTL-NO,
+                       :SVBLPYT-ID,
+                       :SVSBSCR-ID,
+                       :SVPATNT-ID,
+                       :SVPATNT-TRNSMSN-DT,
+                       :SVPATNT-HIERCID-NO,
+                       :SVPATNT-INDRLT-CD,
+                       :SVPATNT-DEATH-DT,
+                       :SVPATNT-UNTMSR-CD,
+                       :SVPATNT-BRTWGHT-NO,
+                       :SVPATNT-PRGNCY-IND,
+                       :SVPATNT-PATIENT-NM,
+                       :SVPATNT-PATFST-NM,
+                       :SVPATNT-PATMDL-NM,
+                       :SVPATNT-PATSFX-NM,
+                       :SVPATNT-PTADL1-TXT,
+                       :SVPATNT-PTADL2-TXT,
+                       :SVPATNT-PTNCITY-NM,
+                       :SVPATNT-PTNSTAT-CD,
+                       :SVPATNT-PTPSZP-CD,
+                       :SVPATNT-CNTRY-CD,
+                       :SVPATNT-PTNTSDV-CD,
+                       :SVPATNT-CNTCT-NM,
+                       :SVPATNT-CMNQL1-CD,
+                       :SVPATNT-CMNCT1-NO,
+                       :SVPATNT-CMNQL2-CD,
+                       :SVPATNT-CMNCT2-NO,
+                       :SVPATNT-PATBRTH-DT,
+                       :SVPATNT-PATGNDR-CD,
+                       :SVPATNT-PRCSCL-NO,
+DBCHG2                 :SVPATNT-PRCRFQF-CD,
+DBCHG2                 :SVPATNT-PRCSPTN-ID
+                           )
+           END-EXEC.
+
+
+           MOVE SQLCODE                     TO LCP-SQLCODE-CHECK.
+
+           IF 88-LCP-SQL-0-SUCCESSFUL
+               CONTINUE
+           ELSE
+               IF 88-LCP-SQL-803-DUPLICATE-ROW
+                   SET 88-LCP-CC-WARNING    TO TRUE
+               ELSE
+                   SET 88-LCP-CC-BAD        TO TRUE
+               END-IF
+               MOVE MQ-MSG-TYPE-CODE             TO WS-MESSAGE-TYPE
+               MOVE WS-PRESENT-PROGRAM           TO LCP-ERROR-MODULE
+               MOVE LCP-PROCESS-REQUEST          TO LCP-ERROR-REQUEST
+               MOVE LCP-SQLCODE-CHECK            TO LCP-ERROR-CODE-9
+      *        SET 88-ERROR-INSERT               TO TRUE
+               MOVE WS-ERROR-TABLE-INFO          TO LCP-ERROR-INFO
+           END-IF.
+
+       P2200-INSERT-RECORD-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS WILL BE PERFORMED FOR COUNT REQUESTS. PARTIAL KEY         *
+      * MQ FORMAT VARIABLES WILL BE MOVED TO THE CORRESPONDING DCLGEN  *
+      * VARIABLE.                                                      *
+      ******************************************************************
+
+       P2300-MOVE-DCLGEN-PARTKEY.
+
+           MOVE MQ-SVTRTYP5-ID               TO SVTRTYP-ID.
+           MOVE MQ-SVTRHDR5-TRNCNTL-NO       TO SVTRHDR-TRNCNTL-NO.
+           MOVE MQ-SVTRHDR5-INTRCHG-ID       TO SVTRHDR-INTRCHG-ID.
+           MOVE MQ-SVTRHDR5-INTCNTL-NO       TO SVTRHDR-INTCNTL-NO.
+           MOVE MQ-SVTRHDR5-GRPCNTL-NO       TO SVTRHDR-GRPCNTL-NO.
+           MOVE MQ-SVBLPYT5-ID               TO SVBLPYT-ID.
+           MOVE MQ-SVSBSCR5-ID               TO SVSBSCR-ID.
+           MOVE MQ-SVPATNT5-ID               TO SVPATNT-ID.
+           MOVE MQ-SVPATNT5-TRNSMSN-DT       TO SVPATNT-TRNSMSN-DT.
+
+       P2300-MOVE-DCLGEN-PARTKEY-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS WILL BE PERFORMED FOR COUNT REQUESTS. IT WILL COUNT THE   *
+      * NO RECORD FOR THE CONDITION.                                   *
+      ******************************************************************
+
+       P2400-COUNT-RECORD.
+
+           EXEC SQL
+               SELECT
+                   COUNT(*)
+               INTO
+                   :WS-NO-OF-RECORDS
+               FROM
+                   SVPATNT5
+               WHERE
+                   SVTRTYP_ID         = :SVTRTYP-ID AND
+                   SVTRHDR_TRNCNTL_NO = :SVTRHDR-TRNCNTL-NO AND
+                   SVTRHDR_INTRCHG_ID = :SVTRHDR-INTRCHG-ID AND
+                   SVTRHDR_INTCNTL_NO = :SVTRHDR-INTCNTL-NO AND
+                   SVTRHDR_GRPCNTL_NO = :SVTRHDR-GRPCNTL-NO AND
+                   SVBLPYT_ID         = :SVBLPYT-ID AND
+                   SVSBSCR_ID         = :SVSBSCR-ID AND
+                   SVPATNT_ID         = :SVPATNT-ID AND
+                   SVPATNT_TRNSMSN_DT = :SVPATNT-TRNSMSN-DT
+               WITH UR
+           END-EXEC.
+
+           MOVE SQLCODE                     TO LCP-SQLCODE-CHECK.
+
+           IF 88-LCP-SQL-0-SUCCESSFUL
+               MOVE WS-NO-OF-RECORDS        TO LCP-NO-OF-RECORDS
+           ELSE
+               SET 88-LCP-CC-BAD            TO TRUE
+           END-IF.
+
+       P2400-COUNT-RECORD-EXIT.
+            EXIT.
+
+      ******************************************************************
+      * THIS WILL BE PERFORMED FOR SELECTING ONE RECORD.               *
+      ******************************************************************
+
+       P2600-SELECT-RECORD.
+
+           EXEC SQL
+               SELECT
+                       SVTRTYP_ID,
+                       SVTRHDR_TRNCNTL_NO,
+                       SVTRHDR_INTRCHG_ID,
+                       SVTRHDR_INTCNTL_NO,
+                       SVTRHDR_GRPCNTL_NO,
+                       SVBLPYT_ID,
+                       SVSBSCR_ID,
+                       SVPATNT_ID,
+                       SVPATNT_TRNSMSN_DT,
+                       SVPATNT_HIERCID_NO,
+                       SVPATNT_INDRLT_CD,
+                       SVPATNT_DEATH_DT,
+                       SVPATNT_UNTMSR_CD,
+                       SVPATNT_BRTWGHT_NO,
+                       SVPATNT_PRGNCY_IND,
+                       SVPATNT_PATIENT_NM,
+                       SVPATNT_PATFST_NM,
+                       SVPATNT_PATMDL_NM,
+                       SVPATNT_PATSFX_NM,
+                       SVPATNT_PTADL1_TXT,
+                       SVPATNT_PTADL2_TXT,
+                       SVPATNT_PTNCITY_NM,
+                       SVPATNT_PTNSTAT_CD,
+                       SVPATNT_PTPSZP_CD,
+                       SVPATNT_CNTRY_CD,
+                       SVPATNT_PTNTSDV_CD,
+                       SVPATNT_CNTCT_NM,
+                       SVPATNT_CMNQL1_CD,
+                       SVPATNT_CMNCT1_NO,
+                       SVPATNT_CMNQL2_CD,
+                       SVPATNT_CMNCT2_NO,
+                       SVPATNT_PATBRTH_DT,
+                       SVPATNT_PATGNDR_CD,
+                       SVPATNT_PRCSCL_NO,
+DBCHG2                 SVPATNT_PRCRFQF_CD,
+DBCHG2                 SVPATNT_PRCSPTN_ID
+               INTO
+                       :SVTRTYP-ID,
+                       :SVTRHDR-TRNCNTL-NO,
+                       :SVTRHDR-INTRCHG-ID,
+                       :SVTRHDR-INTCNTL-NO,
+                       :SVTRHDR-GRPCNTL-NO,
+                       :SVBLPYT-ID,
+                       :SVSBSCR-ID,
+                       :SVPATNT-ID,
+                       :SVPATNT-TRNSMSN-DT,
+                       :SVPATNT-HIERCID-NO,
+                       :SVPATNT-INDRLT-CD,
+                       :SVPATNT-DEATH-DT,
+                       :SVPATNT-UNTMSR-CD,
+                       :SVPATNT-BRTWGHT-NO,
+                       :SVPATNT-PRGNCY-IND,
+                       :SVPATNT-PATIENT-NM,
+                       :SVPATNT-PATFST-NM,
+                       :SVPATNT-PATMDL-NM,
+                       :SVPATNT-PATSFX-NM,
+                       :SVPATNT-PTADL1-TXT,
+                       :SVPATNT-PTADL2-TXT,
+                       :SVPATNT-PTNCITY-NM,
+                       :SVPATNT-PTNSTAT-CD,
+                       :SVPATNT-PTPSZP-CD,
+                       :SVPATNT-CNTRY-CD,
+                       :SVPATNT-PTNTSDV-CD,
+                       :SVPATNT-CNTCT-NM,
+                       :SVPATNT-CMNQL1-CD,
+                       :SVPATNT-CMNCT1-NO,
+                       :SVPATNT-CMNQL2-CD,
+                       :SVPATNT-CMNCT2-NO,
+                       :SVPATNT-PATBRTH-DT,
+                       :SVPATNT-PATGNDR-CD,
+                       :SVPATNT-PRCSCL-NO,
+DBCHG2                 :SVPATNT-PRCRFQF-CD,
+DBCHG2                 :SVPATNT-PRCSPTN-ID
+               FROM
+                   SVPATNT5
+               WHERE
+                   SVTRTYP_ID         = :SVTRTYP-ID AND
+                   SVTRHDR_TRNCNTL_NO = :SVTRHDR-TRNCNTL-NO AND
+                   SVTRHDR_INTRCHG_ID = :SVTRHDR-INTRCHG-ID AND
+                   SVTRHDR_INTCNTL_NO = :SVTRHDR-INTCNTL-NO AND
+                   SVTRHDR_GRPCNTL_NO = :SVTRHDR-GRPCNTL-NO AND
+                   SVBLPYT_ID         = :SVBLPYT-ID AND
+                   SVSBSCR_ID         = :SVSBSCR-ID AND
+                   SVPATNT_ID         = :SVPATNT-ID AND
+                   SVPATNT_TRNSMSN_DT = :SVPATNT-TRNSMSN-DT
+               WITH UR
+           END-EXEC.
+
+
+           MOVE SQLCODE                     TO LCP-SQLCODE-CHECK.
+
+           IF 88-LCP-SQL-0-SUCCESSFUL
+               SET 88-LCP-CC-GOOD           TO TRUE
+               PERFORM P2800-POPULATE-LS-VARS
+           ELSE
+               SET 88-LCP-CC-BAD                 TO TRUE
+               MOVE MQ-MSG-TYPE-CODE        TO WS-MESSAGE-TYPE
+               MOVE WS-PRESENT-PROGRAM           TO LCP-ERROR-MODULE
+               MOVE LCP-PROCESS-REQUEST          TO LCP-ERROR-REQUEST
+               MOVE LCP-SQLCODE-CHECK            TO LCP-ERROR-CODE-9
+      *        SET 88-ERROR-SELECT               TO TRUE
+               MOVE WS-ERROR-TABLE-INFO          TO LCP-ERROR-INFO
+           END-IF.
+
+       P2600-SELECT-RECORD-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS PARA DELETES ALL RECORDS WHOSE KEY HAS BEEN PASSED        *
+      ******************************************************************
+
+       P2750-DELETE-ALL.
+
+           EXEC SQL
+               DELETE
+               FROM
+                   SVPATNT5
+               WHERE
+                   SVTRTYP_ID         = :SVTRTYP-ID AND
+                   SVTRHDR_TRNCNTL_NO = :SVTRHDR-TRNCNTL-NO AND
+                   SVTRHDR_INTRCHG_ID = :SVTRHDR-INTRCHG-ID AND
+                   SVTRHDR_INTCNTL_NO = :SVTRHDR-INTCNTL-NO AND
+                   SVTRHDR_GRPCNTL_NO = :SVTRHDR-GRPCNTL-NO AND
+                   SVBLPYT_ID         = :SVBLPYT-ID AND
+                   SVSBSCR_ID         = :SVSBSCR-ID AND
+                   SVPATNT_ID         = :SVPATNT-ID AND
+                   SVPATNT_TRNSMSN_DT = :SVPATNT-TRNSMSN-DT
+           END-EXEC.
+
+           MOVE SQLCODE                          TO LCP-SQLCODE-CHECK.
+
+           IF 88-LCP-SQL-0-SUCCESSFUL
+               SET 88-LCP-CC-GOOD                TO TRUE
+
+           ELSE
+               SET 88-LCP-CC-BAD                 TO TRUE
+               MOVE MQ-MSG-TYPE-CODE             TO WS-MESSAGE-TYPE
+               MOVE WS-PRESENT-PROGRAM           TO LCP-ERROR-MODULE
+               MOVE LCP-PROCESS-REQUEST          TO LCP-ERROR-REQUEST
+               MOVE LCP-SQLCODE-CHECK            TO LCP-ERROR-CODE-9
+               MOVE WS-ERROR-TABLE-INFO          TO LCP-ERROR-INFO
+           END-IF.
+
+       P2750-DELETE-ALL-EXIT.
+           EXIT.
+
+      ******************************************************************
+      * THIS WILL BE PERFORMED FOR INSERT REQUESTS. VARIABLES FROM THE *
+      * MQ FORMAT COPYBOOK WILL BE MOVED THE CORRECT DCLGEN VARIABLES. *
+      ******************************************************************
+
+       P2800-POPULATE-LS-VARS.
+
+           INITIALIZE WS-CLAIM-RECORD
+           SET 88-MQ-SVPATNT5            TO TRUE
+           MOVE SVTRTYP-ID               TO MQ-SVTRTYP5-ID
+           MOVE SVTRHDR-TRNCNTL-NO       TO MQ-SVTRHDR5-TRNCNTL-NO
+           MOVE SVTRHDR-INTRCHG-ID       TO MQ-SVTRHDR5-INTRCHG-ID
+           MOVE SVTRHDR-INTCNTL-NO       TO MQ-SVTRHDR5-INTCNTL-NO
+           MOVE SVTRHDR-GRPCNTL-NO       TO MQ-SVTRHDR5-GRPCNTL-NO
+           MOVE SVBLPYT-ID               TO MQ-SVBLPYT5-ID
+           MOVE SVSBSCR-ID               TO MQ-SVSBSCR5-ID
+           MOVE SVPATNT-ID               TO MQ-SVPATNT5-ID
+           MOVE SVPATNT-TRNSMSN-DT       TO MQ-SVPATNT5-TRNSMSN-DT
+           MOVE SVPATNT-HIERCID-NO       TO MQ-SVPATNT5-HIERCID-NO
+           MOVE SVPATNT-INDRLT-CD        TO MQ-SVPATNT5-INDRLT-CD
+           MOVE SVPATNT-DEATH-DT      TO MQ-SVPATNT5-DEATH-DT
+           MOVE SVPATNT-UNTMSR-CD     TO MQ-SVPATNT5-UNTMSR-CD
+           MOVE SVPATNT-BRTWGHT-NO    TO MQ-SVPATNT5-BRTWGHT-NO
+           MOVE SVPATNT-PRGNCY-IND    TO MQ-SVPATNT5-PRGNCY-IND
+           MOVE SVPATNT-PATIENT-NM    TO MQ-SVPATNT5-PATIENT-NM
+           MOVE SVPATNT-PATFST-NM     TO MQ-SVPATNT5-PATFST-NM
+           MOVE SVPATNT-PATMDL-NM     TO MQ-SVPATNT5-PATMDL-NM
+           MOVE SVPATNT-PATSFX-NM     TO MQ-SVPATNT5-PATSFX-NM
+           MOVE SVPATNT-PTADL1-TXT    TO MQ-SVPATNT5-PTADL1-TXT
+           MOVE SVPATNT-PTADL2-TXT    TO MQ-SVPATNT5-PTADL2-TXT
+           MOVE SVPATNT-PTNCITY-NM    TO MQ-SVPATNT5-PTNCITY-NM
+           MOVE SVPATNT-PTNSTAT-CD    TO MQ-SVPATNT5-PTNSTAT-CD
+           MOVE SVPATNT-PTPSZP-CD     TO MQ-SVPATNT5-PTPSZP-CD
+           MOVE SVPATNT-CNTRY-CD      TO MQ-SVPATNT5-CNTRY-CD
+           MOVE SVPATNT-PTNTSDV-CD    TO MQ-SVPATNT5-PTNTSDV-CD
+           MOVE SVPATNT-CNTCT-NM      TO MQ-SVPATNT5-CNTCT-NM
+           MOVE SVPATNT-CMNQL1-CD     TO MQ-SVPATNT5-CMNQL1-CD
+           MOVE SVPATNT-CMNCT1-NO-LEN TO MQ-SVPATNT5-CMNCT1-NO-LEN
+           MOVE SPACES                TO MQ-SVPATNT5-CMNCT1-NO-TEXT
+           MOVE SVPATNT-CMNCT1-NO-TEXT(1:SVPATNT-CMNCT1-NO-LEN)
+                                      TO MQ-SVPATNT5-CMNCT1-NO-TEXT
+DEFFIX     MOVE SVPATNT-CMNQL2-CD     TO MQ-SVPATNT5-CMNQL2-CD
+           MOVE SVPATNT-CMNCT2-NO-LEN TO MQ-SVPATNT5-CMNCT2-NO-LEN
+           MOVE SPACES                TO MQ-SVPATNT5-CMNCT2-NO-TEXT
+           MOVE SVPATNT-CMNCT2-NO-TEXT(1:SVPATNT-CMNCT2-NO-LEN)
+                                      TO MQ-SVPATNT5-CMNCT2-NO-TEXT
+           MOVE SVPATNT-PATBRTH-DT    TO MQ-SVPATNT5-PATBRTH-DT
+           MOVE SVPATNT-PATGNDR-CD    TO MQ-SVPATNT5-PATGNDR-CD
+           MOVE SVPATNT-PRCSCL-NO     TO MQ-SVPATNT5-PRCSCL-NO
+DBCHG2     MOVE SVPATNT-PRCRFQF-CD    TO MQ-SVPATNT5-PRCRFQF-CD
+DBCHG2     MOVE SVPATNT-PRCSPTN-ID    TO MQ-SVPATNT5-PRCSPTN-ID.
+           MOVE WS-CLAIM-RECORD       TO SV-CLAIM-RECORD.
+
+       P2800-POPULATE-LS-VARS-EXIT.
+           EXIT.
+      ******************************************************************
+      * THIS WILL MOVE THE DCLGENS VARIABLES INTO THE MQ VARIABLES.    *
+      ******************************************************************
+
+       P3000-REFORMAT-SQLCA.
+
+           CALL 'DSNTIAR' USING SQLCA,
+                                WS-SQL-ERROR-MSG,
+                                WS-SQL-TEXT-LENGTH.
+
+
+       P3000-REFORMAT-SQLCA-EXIT.
+           EXIT.
+      /

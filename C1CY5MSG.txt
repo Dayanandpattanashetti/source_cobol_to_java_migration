@@ -1,0 +1,44 @@
+      ***********************************************************************
+      *                         COPYBOOK C1CY5MSG                           *
+      ***********************************************************************
+      ***********************************************************************
+      * THIS COPYBOOK CONTAINS THE LAYOUT FOR THE CLAIM MESSAGE THAT CSV    *
+      * PROCESSES.                                                          *
+      ***********************************************************************
+      ***********************************************************************
+      *    MAINTENANCE:                                                     *
+      *                                                                     *
+      *        DATE         INITS  DPSR          DESCRIPTION                *
+      *        ----         ----   ----         -----------                 *
+      *        04/12/2010   INFY   P7986a       INITIAL RELEASE             *
+DBCHG1*                                                                     *
+DBCHG1*        12/01/2010   INFY                ADDITIONAL DB CHANGES       *
+      ***********************************************************************
+
+      *01 LEVEL GROUP ITEM SHOULD BE DECLARED IN THE CORRESPONDING PROGRAM.
+
+           10  :XX:-CLAIM-PROCESS-REQUEST    PIC X(04).
+DBCHG1*    10  :XX:-FILLER                   PIC X(5596).
+DBCHG1     10  :XX:-FILLER                   PIC X(7996).
+           10  :XX:-DETAIL-CLAIM-BELOW  REDEFINES :XX:-FILLER.
+               15  :XX:-UCK-ID               PIC X(11).
+               15  :XX:-SVCLSUM5-VALSTAT-ID  PIC X(01).
+DBCHG1*        15  :XX:-REST                 PIC X(5584).
+DBCHG1         15  :XX:-REST                 PIC X(7984).
+           10  :XX:-DETAIL-CLAIM-ABOVE  REDEFINES :XX:-FILLER.
+               15  :XX:-SVTRTYP5-ID          PIC X(12).
+               15  :XX:-SVTRHDR5-TRNCNTL-NO  PIC X(09).
+               15  :XX:-SVTRHDR5-INTRCHG-ID  PIC X(15).
+               15  :XX:-SVTRHDR5-INTCNTL-NO  PIC S9(09).
+               15  :XX:-SVTRHDR5-GRPCNTL-NO  PIC S9(09).
+               15  :XX:-SVBLPYT5-ID          PIC S9(09).
+               15  :XX:-SVSBSCR5-ID          PIC S9(09).
+               15  :XX:-SVPATNT5-ID          PIC S9(09).
+               15  :XX:-CL-UCK-ID            PIC X(11).
+               15  :XX:-SVCLAIM5-TRNSMSN-DT  PIC X(10).
+DBCHG1*        15  :XX:-REST                 PIC X(5494).
+DBCHG1         15  :XX:-REST                 PIC X(7894).
+      ***********************************************************************
+      *                      END OF COPYBOOK C1CY5MSG                       *
+      ***********************************************************************
+

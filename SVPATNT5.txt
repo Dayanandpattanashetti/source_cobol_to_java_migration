@@ -1,0 +1,92 @@
+      ******************************************************************
+      * DCLGEN TABLE SVPATNT5
+      ******************************************************************
+           EXEC SQL DECLARE SVPATNT5 TABLE
+           ( SVTRTYP_ID                     CHAR(12) NOT NULL,
+             SVTRHDR_TRNCNTL_NO             CHAR(9) NOT NULL,
+             SVTRHDR_INTRCHG_ID             CHAR(15) NOT NULL,
+             SVTRHDR_INTCNTL_NO             INTEGER NOT NULL,
+             SVTRHDR_GRPCNTL_NO             INTEGER NOT NULL,
+             SVBLPYT_ID                     INTEGER NOT NULL,
+             SVSBSCR_ID                     INTEGER NOT NULL,
+             SVPATNT_ID                     INTEGER NOT NULL,
+             SVPATNT_TRNSMSN_DT             DATE NOT NULL,
+             SVPATNT_HIERCID_NO             CHAR(12) NOT NULL,
+             SVPATNT_INDRLT_CD              CHAR(2) NOT NULL,
+             SVPATNT_DEATH_DT               CHAR(35) NOT NULL,
+             SVPATNT_UNTMSR_CD              CHAR(2) NOT NULL,
+             SVPATNT_BRTWGHT_NO             CHAR(10) NOT NULL,
+             SVPATNT_PRGNCY_IND             CHAR(1) NOT NULL,
+             SVPATNT_PATIENT_NM             CHAR(60) NOT NULL,
+             SVPATNT_PATFST_NM              CHAR(35) NOT NULL,
+             SVPATNT_PATMDL_NM              CHAR(25) NOT NULL,
+             SVPATNT_PATSFX_NM              CHAR(10) NOT NULL,
+             SVPATNT_PTADL1_TXT             CHAR(55) NOT NULL,
+             SVPATNT_PTADL2_TXT             CHAR(55) NOT NULL,
+             SVPATNT_PTNCITY_NM             CHAR(30) NOT NULL,
+             SVPATNT_PTNSTAT_CD             CHAR(2) NOT NULL,
+             SVPATNT_PTPSZP_CD              CHAR(15) NOT NULL,
+             SVPATNT_CNTRY_CD               CHAR(3) NOT NULL,
+             SVPATNT_PTNTSDV_CD             CHAR(3) NOT NULL,
+             SVPATNT_CNTCT_NM               CHAR(60) NOT NULL,
+             SVPATNT_CMNQL1_CD              CHAR(2) NOT NULL,
+             SVPATNT_CMNCT1_NO              VARCHAR(256) NOT NULL,
+             SVPATNT_CMNQL2_CD              CHAR(2) NOT NULL,
+             SVPATNT_CMNCT2_NO              VARCHAR(256) NOT NULL,
+             SVPATNT_PATBRTH_DT             CHAR(35) NOT NULL,
+             SVPATNT_PATGNDR_CD             CHAR(1) NOT NULL,
+             SVPATNT_PRCSCL_NO              CHAR(50) NOT NULL,
+             SVPATNT_PRCRFQF_CD             CHAR(3) NOT NULL,
+             SVPATNT_PRCSPTN_ID             CHAR(50) NOT NULL
+           ) END-EXEC.
+      ******************************************************************
+      * COBOL DECLARATION FOR TABLE SVPATNT5
+      ******************************************************************
+       01  DCLSVPATNT5.
+           10 SVTRTYP-ID           PIC X(12).
+           10 SVTRHDR-TRNCNTL-NO   PIC X(9).
+           10 SVTRHDR-INTRCHG-ID   PIC X(15).
+           10 SVTRHDR-INTCNTL-NO   PIC S9(9) USAGE COMP.
+           10 SVTRHDR-GRPCNTL-NO   PIC S9(9) USAGE COMP.
+           10 SVBLPYT-ID           PIC S9(9) USAGE COMP.
+           10 SVSBSCR-ID           PIC S9(9) USAGE COMP.
+           10 SVPATNT-ID           PIC S9(9) USAGE COMP.
+           10 SVPATNT-TRNSMSN-DT   PIC X(10).
+           10 SVPATNT-HIERCID-NO   PIC X(12).
+           10 SVPATNT-INDRLT-CD    PIC X(2).
+           10 SVPATNT-DEATH-DT     PIC X(35).
+           10 SVPATNT-UNTMSR-CD    PIC X(2).
+           10 SVPATNT-BRTWGHT-NO   PIC X(10).
+           10 SVPATNT-PRGNCY-IND   PIC X(1).
+           10 SVPATNT-PATIENT-NM   PIC X(60).
+           10 SVPATNT-PATFST-NM    PIC X(35).
+           10 SVPATNT-PATMDL-NM    PIC X(25).
+           10 SVPATNT-PATSFX-NM    PIC X(10).
+           10 SVPATNT-PTADL1-TXT   PIC X(55).
+           10 SVPATNT-PTADL2-TXT   PIC X(55).
+           10 SVPATNT-PTNCITY-NM   PIC X(30).
+           10 SVPATNT-PTNSTAT-CD   PIC X(2).
+           10 SVPATNT-PTPSZP-CD    PIC X(15).
+           10 SVPATNT-CNTRY-CD     PIC X(3).
+           10 SVPATNT-PTNTSDV-CD   PIC X(3).
+           10 SVPATNT-CNTCT-NM     PIC X(60).
+           10 SVPATNT-CMNQL1-CD    PIC X(2).
+           10 SVPATNT-CMNCT1-NO.
+              49 SVPATNT-CMNCT1-NO-LEN
+                 PIC S9(4) USAGE COMP.
+              49 SVPATNT-CMNCT1-NO-TEXT
+                 PIC X(256).
+           10 SVPATNT-CMNQL2-CD    PIC X(2).
+           10 SVPATNT-CMNCT2-NO.
+              49 SVPATNT-CMNCT2-NO-LEN
+                 PIC S9(4) USAGE COMP.
+              49 SVPATNT-CMNCT2-NO-TEXT
+                 PIC X(256).
+           10 SVPATNT-PATBRTH-DT   PIC X(35).
+           10 SVPATNT-PATGNDR-CD   PIC X(1).
+           10 SVPATNT-PRCSCL-NO    PIC X(50).
+           10 SVPATNT-PRCRFQF-CD   PIC X(3).
+           10 SVPATNT-PRCSPTN-ID   PIC X(50).
+      ******************************************************************
+      * THE NUMBER OF COLUMNS DESCRIBED BY THIS DECLARATION IS 36      *
+      ******************************************************************

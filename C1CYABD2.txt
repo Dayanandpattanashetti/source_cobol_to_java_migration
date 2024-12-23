@@ -1,0 +1,28 @@
+      ******************************************************************
+       P1000-DB2-ABEND.
+      ******************************************************************
+
+           IF  88-DEBUG-MODE
+               DISPLAY 'IN P1000-DB2-ABEND PARA'
+           END-IF.
+
+           CALL 'DSNTIAR' USING SQLCA
+                                DB2-ERROR-MESSAGE
+                                ERROR-TEXT-LEN.
+
+           IF RETURN-CODE = ZERO
+               SET ERROR-INDEX TO 1
+               PERFORM UNTIL ERROR-TEXT (ERROR-INDEX) = SPACES
+                             OR ERROR-INDEX > 10
+                 DISPLAY ERROR-TEXT (ERROR-INDEX)
+                 SET ERROR-INDEX UP BY 1
+               END-PERFORM
+           END-IF.
+
+           MOVE  SQLCODE                    TO EDITED-SQL-CODE.
+
+           DISPLAY 'SQLCODE = ' EDITED-SQL-CODE.
+           DISPLAY 'BAD DB2 RETURN CODE '.
+
+           PERFORM  P9999-CALL-ABEND.
+

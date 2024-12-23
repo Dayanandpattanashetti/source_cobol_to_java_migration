@@ -1,0 +1,15 @@
+      ******************************************************************
+      * THESE VARIABLES ARE REQUIRED TO CALL DSNTIAR                   *
+      ******************************************************************
+
+       01  DB2-ERROR-MESSAGE.
+           05  ERROR-LEN           PIC S9(04) COMP
+                                               VALUE +720.
+           05  ERROR-TEXT          PIC  X(72)  OCCURS 10 TIMES
+                                               INDEXED BY ERROR-INDEX.
+
+       01  ERROR-TEXT-LEN          PIC S9(09) COMP
+                                               VALUE +72.
+
+       01  EDITED-SQL-CODE         PIC ++999.
+

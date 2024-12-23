@@ -1,0 +1,165 @@
+      ***********************************************************************
+      *                         COPYBOOK C1CY5DB2                           *
+      ***********************************************************************
+      ***********************************************************************
+      * THIS COPYBOOK CONTAINS ALL THE COMMON VARIABLES THAT WILL BE USED   *
+      * FOR MAKING ANY DB2 TABLE HANDLER CALL.                              *
+      ***********************************************************************
+      ***********************************************************************
+      *    MAINTENANCE:                                                     *
+      *                                                                     *
+      *        DATE         INITS  DPSR          DESCRIPTION                *
+      *        ----         ----   ----         -----------                 *
+      *        04/12/2010   INFY   P7986a       INITIAL RELEASE             *
+      ***********************************************************************
+
+      *01 LEVEL GROUP ITEM SHOULD BE DECLARED IN THE CORRESPONDING PROGRAM.
+
+      ***********************************************************************
+      *  INPUT SECTION OF THE COPYBOOK. TO BE POPULATED BY CALLING PROGRAM  *
+      ***********************************************************************
+          05  LCP-CALLING-MODULE             PIC X(08).
+          05  LCP-PROCESS-REQUEST            PIC X(06).
+              88  88-LCP-INSERT-REQUEST                  VALUE
+                                                           'INSERT'.
+              88  88-LCP-COUNT-REQUEST                   VALUE
+                                                           'COUNT '.
+              88  88-LCP-SELECT-ONE-REQUEST              VALUE
+                                                           'SELEC1'.
+              88  88-LCP-SELECT-ALL-REQUEST              VALUE
+                                                           'SELECA'.
+              88  88-LCP-SELECT-ERA-REQUEST              VALUE
+                                                           'SELECE'.
+              88  88-LCP-SELECT-HMO-REQUEST              VALUE
+                                                           'SELHMO'.
+              88  88-LCP-UPDATE-REQUEST                  VALUE
+                                                           'UPDATE'.
+              88  88-LCP-DELETE-REQUEST                  VALUE
+                                                           'DELETE'.
+              88  88-LCP-CURSOR-CLOSE-REQUEST            VALUE
+                                                           'CLOSE '.
+      ***********************************************************************
+      *                PROCESSING SECTION OF THE COPYBOOK                   *
+      ***********************************************************************
+          05  LCP-SELECT-ALL-FLAG            PIC X(01).
+              88  88-LCP-SELECT-FIRST-REC                VALUE 'Y'.
+              88  88-LCP-SELECT-NEXT-REC                 VALUE 'N'.
+          05  LCP-EOF-CURSOR-FLAG            PIC X(01).
+              88  88-LCP-EOF-CURSOR                      VALUE 'Y'.
+              88  88-LCP-NO-EOF-CURSOR                   VALUE 'N'.
+      ***********************************************************************
+      *                  OUTPUT SECTION OF THE COPYBOOK                     *
+      ***********************************************************************
+      ***********************************************************************
+      * THE RETURN CODE FOR THE CALLING PROGRAM TO DECIDE THE FUTURE COURSE *
+      * OF ACTION.                                                          *
+      ***********************************************************************
+          05  LCP-RETURN-CODE                PIC S9(09)        COMP.
+              88  88-LCP-CC-GOOD                         VALUE
+                                                          000000000.
+              88  88-LCP-CC-WARNING                      VALUE
+                                                          000000004.
+              88  88-LCP-CC-INVALID-REQUEST              VALUE
+                                                          000000012.
+              88  88-LCP-CC-INVALID-DATA                 VALUE
+                                                          000000016.
+              88  88-LCP-CC-BAD                          VALUE
+                                                          999999999.
+
+      ***********************************************************************
+      *    CONTENT OF SQL COMMUNICATION AREA (SQLCA) AFTER SQL EXECUTION    *
+      ***********************************************************************
+          05  LCP-SQLCODE-CHECK              PIC S9(09)        COMP.
+              88  88-LCP-SQL-0-SUCCESSFUL                VALUE ZEROES.
+              88  88-LCP-SQL-NEGATIVE-RETURN             VALUE -999
+                                            THRU -001.
+              88  88-LCP-SQL-100-NOT-FOUND               VALUE +100.
+              88  88-LCP-SQL-100-CURSOR-EMPTY            VALUE +100.
+              88  88-LCP-SQL-305-NO-DATA-RET             VALUE -305.
+              88  88-LCP-SQL-803-DUPLICATE-ROW           VALUE -803.
+              88  88-LCP-SQL-805-BIND-ERROR              VALUE -805.
+              88  88-LCP-SQL-811-MULTIPLE-ROWS           VALUE -811.
+              88  88-LCP-SQL-904-CONTENTION              VALUE -904.
+              88  88-LCP-SQL-911-DEADLOCK-TIME           VALUE -911.
+              88  88-LCP-SQL-913-DEADLOCK-TIME           VALUE -913.
+              88  88-LCP-SQL-922-AUTH-ERROR              VALUE -922.
+      ***********************************************************************
+      *                             END OF SQLCA.                           *
+      ***********************************************************************
+          05  LCP-NO-OF-RECORDS              PIC S9(09)        COMP.
+      ***********************************************************************
+      *                    GENERIC ERROR DETAILS.                           *
+      ***********************************************************************
+          05  LCP-GENERIC-MESSAGE.
+              10  LCP-ERROR-MODULE           PIC X(08).
+              10  FILLER                     PIC X(01).
+              10  LCP-ERROR-DETAIL.
+                  15  LCP-ERROR-REQUEST      PIC X(06).
+                  15  FILLER                 PIC X(03).
+                  15  LCP-ERROR-CODE         PIC X(05).
+                  15  LCP-ERROR-CODE-9 REDEFINES
+                      LCP-ERROR-CODE         PIC S9(04)
+                                             SIGN LEADING SEPARATE.
+      *           15  FILLER                 PIC X(01).
+                  15  LCP-REASON-CODE        PIC X(04).
+                  15  LCP-REASON-CODE-9 REDEFINES
+                      LCP-REASON-CODE        PIC 9(04).
+                  15  FILLER                 PIC X(01).
+                  15  LCP-ERROR-MESSAGE      PIC X(96).
+                  15  LCP-ERR-DETAIL    REDEFINES
+                      LCP-ERROR-MESSAGE.
+                      20  LCP-ERROR-MSG      PIC X(61).
+                      20  LCP-ERROR-INFO     PIC X(35).
+                  15  LCP-MCI-ERROR     REDEFINES
+                      LCP-ERROR-MESSAGE.
+                      20  LCP-MCI-ERROR-MSG
+                                             PIC X(32).
+                      20  LCP-MCI-ERROR-INFO
+                                             PIC X(64).
+      ***********************************************************************
+      * IF THE FIELD VALUES FOR INSERT QUERIES CONTAIN ANY ALPHANUMERIC DATA*
+      * IN A NUMERIC FIELD, THE FIRST POSITION AND LENGTH OF SUCH A FIELD   *
+      * WILL BE REPORTED IN THESE FIELDS.                                   *
+      ***********************************************************************
+          05  LCP-ASRA-ERROR-FIELDS.
+              15  LCP-FIELD-OFFSET           PIC 9(04)   VALUE ZEROES.
+              15  FILLER                     PIC X(01)   VALUE ':'.
+              15  LCP-FIELD-LENGTH           PIC 9(03)   VALUE ZEROES.
+
+      ***********************************************************************
+      * MCI DATABASE DEADLOCK RETRY COUNT                                   *
+      ***********************************************************************
+          05  LCP-MCI-MAX-DLCK-TRY-CNT       PIC X(03).
+          05  LCP-MCI-MAX-DLCK-TRY-CNT-9   REDEFINES
+              LCP-MCI-MAX-DLCK-TRY-CNT       PIC 9(03).
+          05  LCP-MCI-DLCK-RTRY-COUNT        PIC X(03).
+          05  LCP-MCI-DLCK-RTRY-COUNT-9    REDEFINES
+              LCP-MCI-DLCK-RTRY-COUNT        PIC 9(03).
+
+      ***********************************************************************
+      * TO DETERMINE WHETHER THE MCI LOAD FAIL OCCURRED DUE TO ERROR IN CSV *
+      * OR MCI DATABASE                                                     *
+      ***********************************************************************
+
+          05  LCP-IDENTIFY-ABEND             PIC X(03).
+              88  88-LCP-ERR-IN-CSV                      VALUE 'CSV'.
+              88  88-LCP-ERR-IN-MCI                      VALUE 'MCI'.
+
+      ***********************************************************************
+      *       CURRENT CICS-MQ REGION DETAILS                                *
+      ***********************************************************************
+          05  LCP-ENV-DETAILS.
+              10  LCP-MQUEUE-ENV-ID          PIC X(01)   VALUE SPACES.
+              10  LCP-MQUEUE-REGION-ID       PIC X(04)   VALUE SPACES.
+      ***********************************************************************
+      *       DSNTIAR INTERPRETATION OF SQL COMMUNICATION AREA (SQLCA)      *
+      ***********************************************************************
+          05 LCP-SQL-ERROR-MSG.
+              10 LCP-SQL-MSG-LENGTH          PIC S9(4)         COMP
+                                                         VALUE +936.
+              10 LCP-SQL-ERROR-MSG-TEXT      PIC X(72)
+                                             OCCURS 13 TIMES.
+      ***********************************************************************
+      *                      END OF COPYBOOK C1CY5DB2                       *
+      ***********************************************************************
+
